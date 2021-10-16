@@ -1,0 +1,136 @@
+{% extends 'admin/header.html' %}
+{% load static %}
+{% block content %}
+
+<div class="content-wrapper"> 
+    <!-- Content Header (Page header) -->
+    <div class="content-header sty-one">
+      <h1>Data Tables</h1>
+      <ol class="breadcrumb">
+        <li><a href="#">Home</a></li>
+        <li><i class="fa fa-angle-right"></i> <a href="#">Tables</a></li>
+        <li><i class="fa fa-angle-right"></i> Data Tables</li>
+      </ol>
+    </div>
+    
+    <!-- Main content -->
+    <div class="content">
+      <div class="card">
+      <div class="card-body">
+      <h4 class="text-black">Enterprise Table</h4>
+      <input type="button" class="btn btn-accent" style="background:#0077d3" onclick="generate()" value="Export" />
+      <div class="table-responsive">
+                  <table id="table" class="table table-bordered table-hover" data-name="cool-table">
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Person Name</th>
+                        <th>Company Name</th>
+                        <th>Address</th>
+                        <th>Email</th>
+                        <th>Contact no</th>
+                        <th>Action</th>
+                        
+                      </tr>
+                    </thead>
+                    <tbody>
+                    {% for e in enterprises %}
+                      <tr>
+                        <td>{{ e.id }}</td>
+                        <td>{{ e.person_name }}</td>
+                        <td>{{ e.company_name }}</td>
+                        <td>{{ e.address }}</td>
+                        <td>{{ e.email }}</td>
+                        <td>{{ e.contact_no }}</td>
+                        <td>
+                        {% if e.block_status %}
+                        <a href="/manageenterprise/?unblock={{e.id}}" class="btn btn-success mx-2 btn-sm">Unblock</a>
+                       
+                        {% else %}
+                        <a href="/manageenterprise/?block={{e.id}}" class="btn btn-danger mx-2 btn-sm">block</a>
+                        {% endif %}
+                      </td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>  
+                  </table>
+
+                  <script>
+                    function generate() {
+                        var doc = new jsPDF();
+                
+                        var pageHeight = doc.internal.pageSize.height || doc.internal.pageSize.getHeight();
+                        var pageWidth = doc.internal.pageSize.width || doc.internal.pageSize.getWidth();
+                        // FOOTER
+                        let str = "Manage Enterprise Report";
+                        doc.setTextColor(100);
+                        doc.setFontSize(20);
+                        doc.text(str, pageWidth / 2, pageHeight  - 285, 'center');
+                        // Simple html example
+                        doc.autoTable({html: '#table',startY:20});
+                
+                        doc.save('table.pdf');
+                    }
+                </script>
+
+
+                  </div>
+      </div></div>
+      
+      
+
+    </div>
+    <!-- /.content --> 
+  </div>
+
+  <script type="text/javascript" src="jquery-3.4.1.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.22/pdfmake.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
+  <script src="{% static '/plugins/table-expo/jspdf.debug.js' %}"></script>
+<script src="{% static '/plugins/table-expo/jspdf.plugin.autotable.js' %}"></script>
+
+  <script type="text/javascript">
+      $("body").on("click", "#btnExport", function () {
+          html2canvas($('#tableExample3')[0], {
+              onrendered: function (canvas) {
+                  var data = canvas.toDataURL();
+                  var docDefinition = {
+                      content: [{
+                          image: data,
+                          width: 500
+                      }]
+                  };
+                  pdfMake.createPdf(docDefinition).download("Table.pdf");
+              }
+          });
+      });
+  </script>
+
+
+  {% endblock %}
+  {% block script %}
+  <script src="{% static 'dist/plugins/datatables/jquery.dataTables.min.js' %}"></script> 
+  <script src="{% static 'dist/plugins/datatables/dataTables.bootstrap.min.js' %}"></script> 
+  <script>
+    $(function () {
+      $('#example1').DataTable()
+      $('#example2').DataTable({
+        'paging'      : true,
+        'lengthChange': false,
+        'searching'   : false,
+        'ordering'    : true,
+        'info'        : true,
+        'autoWidth'   : false
+      })
+    })
+  </script>
+  
+  <script src="{% static 'dist/plugins/table-expo/filesaver.min.js' %}"></script>
+  <script src="{% static 'dist/plugins/table-expo/xls.core.min.js' %}"></script>
+  <script src="{% static 'dist/plugins/table-expo/tableexport.js' %}"></script>
+  <script>
+  $("table").tableExport({formats: ["csv", "txt"],    });
+  </script>
+  {% endblock %}
+  
+  
